@@ -131,6 +131,36 @@ flatpak install -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinM
 echo "Flatpak apps Installation Done"
 }
 
+install_nerd_fonts() {
+echo "Installing fonts"
+
+mkdir -p $HOME/.local/share/fonts/
+
+fonts=( "FiraCode" "FiraMono" "JetBrainsMono" "3270" "0xProto" )
+
+for font in "${fonts[@]}"; do
+		if ls $HOME/.local/share/fonts/$font/*.ttf &>/dev/null; then
+				echo "Font $font is already installed. Skipping"
+		else
+				echo "Installing font: $font"
+				wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/$font.zip" -P /tmp || {
+						echo "Warning: Error downloading font $font"
+						continue
+				}
+				unzip -q /tmp/$font.zip -d $HOME/.local/share/fonts/$font/ || {
+						echo "Warning:Error extracting font $font."
+						continue
+		}
+		rm /tmp/$font.zip
+		fi
+done
+
+fc-cache -f || {echo "Warning: Error rebuilding font cache"}
+
+echo "Font installation completed"
+
+}
+
 remove_packages() {
 		echo "removing useless gnome packages"
 		sudo dnf remove -y gnome-connections gnome-tour gnome-boxes gnome-maps rhythmbox 
@@ -150,6 +180,7 @@ install_openh264_library
 install_ffmpeg
 install_additional_codec
 install_hardware_accelerated_codec_intel_new
+install_nerd_fonts
 setup_local_dirs
 install_kitty
 install_chezmoi
