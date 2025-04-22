@@ -136,7 +136,7 @@ echo "Installing fonts"
 
 mkdir -p $HOME/.local/share/fonts/
 
-fonts=( "FiraCode" "FiraMono" "JetBrainsMono" "3270" "0xProto" )
+fonts=( "FiraCode" "FiraMono" "JetBrainsMono" "3270" "" )
 
 for font in "${fonts[@]}"; do
 		if ls $HOME/.local/share/fonts/$font/*.ttf &>/dev/null; then
@@ -188,4 +188,4 @@ install_starship
 install_flatpak_apps
 remove_packages
 
-
+echo "All installations completed successfully!"
