@@ -166,7 +166,7 @@ local jellyfinMediaPlayer='com.github.iwalton3.jellyfin-media-player'
 local extension='com.mattjakeman.ExtensionManager '
 local dconf='ca.desrt.dconf-editor'
 
-flatpak install -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
+flatpak install flathub -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
 
 echo "Flatpak apps Installation Done"
 echo "-----------------------------------------------"
