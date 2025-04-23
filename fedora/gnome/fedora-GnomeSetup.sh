@@ -2,61 +2,87 @@
 
 update_system_packages() {
 echo "System updates Starts"
+echo "-----------------------------------------------"
 echo ""
 sudo dnf upgrade -y 
 echo ""
+echo "-----------------------------------------------"
 echo "System updates Complete"
 }
 
 install_packages() {
 echo "Installing necessary packages"
+echo "-----------------------------------------------"
+echo ""
 sudo dnf install -y gh lsd neovim btop fzf fastfetch mpv distrobox keepassxc bat qbittorrent gnome-tweaks @virtualization
+echo ""
+echo "-----------------------------------------------"
 echo "Finished Installing packages"
 }
 
 install_free_nonfree_repositories() {
 echo "Installing free and Non free repos"
+echo "-----------------------------------------------"
+echo ""
 sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
+echo "-----------------------------------------------"
 }
+
 install_openh264_library() {
 echo "Installing open264 library"
+echo "-----------------------------------------------"
+echo ""
 		sudo dnf -y config-manager setopt fedora-cisco-openh264.enabled=1
+echo ""
+echo "-----------------------------------------------"
 echo "Done"
 }
 
 install_ffmpeg() {
 echo "Installing ffmpeg"
+echo "-----------------------------------------------"
+echo ""
 		sudo dnf -y swap ffmpeg-free ffmpeg --allowerasing
+echo ""
+echo "-----------------------------------------------"
 echo "Done"
 }
 
 install_additional_codec() {
 echo "installing addiotional multimedia codecs"
+echo "-----------------------------------------------"
+echo ""
 		sudo dnf -y update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+echo ""
+echo "-----------------------------------------------"
 echo "Done"
 }
 
 install_hardware_accelerated_codec_intel_new() {
 echo "hwa intel new"
+echo "-----------------------------------------------"
+echo ""
 		sudo dnf -y install intel-media-driver
+echo ""
+echo "-----------------------------------------------"
 }
 
-install_hardware_accelerated_codec_intel_older(){
-echo "hwa intel older"
-sudo dnf install libva-intel-driver
-}
+#install_hardware_accelerated_codec_intel_older(){
+#echo "hwa intel older"
+#sudo dnf install libva-intel-driver
+#}
 
 # synchthing available in fedora repo is outdated
 # so download from their website
-
-##
-echo "Now lets install Kitty, Chezmoi and starship"
 
 
 #start creating the bin folder in .local
 
 setup_local_dirs(){
+echo "Create .local/bin and .local/applications directories"
+echo ""
+echo "-----------------------------------------------"
 local local_bin="$HOME/.local/bin/"
 local local_applications="$HOME/.local/share/applications/"
 
@@ -81,6 +107,8 @@ fi
 install_kitty() {
 
 		echo "Starting Kitty terminal installations"
+echo "-----------------------------------------------"
+echo ""
 #install kitty terminal
 curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
 
@@ -97,23 +125,35 @@ cp ~/.local/kitty.app/share/applications/kitty-open.desktop ~/.local/share/appli
 # Update the paths to the kitty and its icon in the kitty.desktop file(s)
 sed -i "s|Icon=kitty|Icon=/home/$USER/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" ~/.local/share/applications/kitty*.desktop
 sed -i "s|Exec=kitty|Exec=/home/$USER/.local/kitty.app/bin/kitty|g" ~/.local/share/applications/kitty*.desktop
+echo ""
+echo "-----------------------------------------------"
 		echo "Done"
 }
 
 install_chezmoi() {
 echo "Installing Chezmoi"
+echo "-----------------------------------------------"
+echo ""
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b $HOME/.local/bin
+echo ""
+echo "-----------------------------------------------"
 echo "Chezmoi Installed"
 }
 
 install_starship() {
 echo "installing starship prompt"
+echo "-----------------------------------------------"
+echo ""
 #install starship prompt
 curl -sS https://starship.rs/install.sh | sh 
+echo ""
+echo "-----------------------------------------------"
 }
 
 install_flatpak_apps() {
 echo "Installing flatpak applications"
+echo "-----------------------------------------------"
+echo ""
 # packages variables
 local obsidian='md.obsidian.Obsidian'
 local zen='app.zen_browser.zen'
@@ -129,10 +169,13 @@ local dconf='ca.desrt.dconf-editor'
 flatpak install -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
 
 echo "Flatpak apps Installation Done"
+echo "-----------------------------------------------"
 }
 
 install_nerd_fonts() {
 echo "Installing fonts"
+echo "-----------------------------------------------"
+echo ""
 
 mkdir -p $HOME/.local/share/fonts/
 
@@ -143,6 +186,7 @@ for font in "${fonts[@]}"; do
 				echo "Font $font is already installed. Skipping"
 		else
 				echo "Installing font: $font"
+echo ""
 				wget -q "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/$font.zip" -P /tmp || {
 						echo "Warning: Error downloading font $font"
 						continue
@@ -157,18 +201,24 @@ done
 
 fc-cache -f || {echo "Warning: Error rebuilding font cache"}
 
+echo ""
+echo "-----------------------------------------------"
 echo "Font installation completed"
 
 }
 
 remove_packages() {
 		echo "removing useless gnome packages"
+echo "-----------------------------------------------"
+echo ""
 		sudo dnf remove -y gnome-connections gnome-tour gnome-boxes gnome-maps rhythmbox 
 		echo "removed"
 		echo ""
 		echo "Cleaning Up unwanted hanging packages"
 		sudo dnf autoremove -y
+echo ""
 		echo "Auto remove done"
+echo ""
 }
 
 
@@ -188,4 +238,4 @@ install_starship
 install_flatpak_apps
 remove_packages
 
-echo "All installations completed successfully!"
+echo "All installations completed successfully! Restart Your system now"
