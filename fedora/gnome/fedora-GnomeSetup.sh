@@ -14,7 +14,7 @@ install_packages() {
 echo "Installing necessary packages"
 echo "-----------------------------------------------"
 echo ""
-sudo dnf install -y gh lsd neovim btop fzf fastfetch mpv distrobox keepassxc bat qbittorrent gnome-tweaks @virtualization
+sudo dnf install -y gh lsd neovim btop fzf fastfetch mpv distrobox tealdeer keepassxc bat qbittorrent gnome-tweaks @virtualization
 echo ""
 echo "-----------------------------------------------"
 echo "Finished Installing packages"
