@@ -15,8 +15,13 @@ extension='com.mattjakeman.ExtensionManager '
 dconf='ca.desrt.dconf-editor'
 
 install_basic() {
-flatpak install -y $obsidian $zen $flatseal $stremio $bottles $warehouse $pikabk $onlyoffice $jellyfinMediaPlayer $extension $dconf
+flatpak install flathub -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
 }
+
+#remove_flatpaks() {
+#	flatpak uninstall --unused -y $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
+#}
+#remove_flatpaks
 
 install_basic
 
