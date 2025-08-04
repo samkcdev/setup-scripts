@@ -1,39 +1,57 @@
-#! /bin/bash
+#! /usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
+
+if [[ $EUID -ne 0 ]]; then
+	echo "⚠️  Please run as root: sudo $0"
+	exit 1
+fi
 
 update_system_packages() {
 echo "System updates Starts"
 echo "-----------------------------------------------"
 echo ""
-sudo dnf upgrade -y 
+dnf upgrade -y 
 echo ""
 echo "-----------------------------------------------"
 echo "System updates Complete"
 }
 
+# packages to be installed array
+cli_pkgs=(
+	gh lsd neovim btop fzf fastfetch mpv distrobox tealdeer 
+	keepassxc bat qbittorrent gnome-tweaks @virtualization
+)
+
+free_nonfree_repos=(
+ https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm 
+ https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+)
+
 install_packages() {
 echo "Installing necessary packages"
 echo "-----------------------------------------------"
 echo ""
-sudo dnf install -y gh lsd neovim btop fzf fastfetch mpv distrobox tealdeer keepassxc bat qbittorrent gnome-tweaks @virtualization
+dnf install -y "${cli_pkgs[@]}" "${free_nonfree_repos[@]}" 
 echo ""
 echo "-----------------------------------------------"
 echo "Finished Installing packages"
 }
 
-install_free_nonfree_repositories() {
-echo "Installing free and Non free repos"
-echo "-----------------------------------------------"
-echo ""
-sudo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+#install_free_nonfree_repositories() {
+#echo "Installing free and Non free repos"
+#cho "-----------------------------------------------"
+#cho ""
+#udo dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-echo "-----------------------------------------------"
-}
+#cho "-----------------------------------------------"
+#
 
 install_openh264_library() {
 echo "Installing open264 library"
 echo "-----------------------------------------------"
 echo ""
-		sudo dnf -y config-manager setopt fedora-cisco-openh264.enabled=1
+		dnf -y config-manager setopt fedora-cisco-openh264.enabled=1
 echo ""
 echo "-----------------------------------------------"
 echo "Done"
@@ -43,7 +61,7 @@ install_ffmpeg() {
 echo "Installing ffmpeg"
 echo "-----------------------------------------------"
 echo ""
-		sudo dnf -y swap ffmpeg-free ffmpeg --allowerasing
+		dnf -y swap ffmpeg-free ffmpeg --allowerasing
 echo ""
 echo "-----------------------------------------------"
 echo "Done"
@@ -53,7 +71,7 @@ install_additional_codec() {
 echo "installing addiotional multimedia codecs"
 echo "-----------------------------------------------"
 echo ""
-		sudo dnf -y update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
+		dnf -y update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 echo ""
 echo "-----------------------------------------------"
 echo "Done"
@@ -63,7 +81,7 @@ install_hardware_accelerated_codec_intel_new() {
 echo "hwa intel new"
 echo "-----------------------------------------------"
 echo ""
-		sudo dnf -y install intel-media-driver
+		dnf -y install intel-media-driver
 echo ""
 echo "-----------------------------------------------"
 }
@@ -179,7 +197,7 @@ echo ""
 
 mkdir -p $HOME/.local/share/fonts/
 
-fonts=( "FiraCode" "FiraMono" "JetBrainsMono" "3270" "" )
+fonts=( "FiraCode" "FiraMono" "JetBrainsMono" "3270" )
 
 for font in "${fonts[@]}"; do
 		if ls $HOME/.local/share/fonts/$font/*.ttf &>/dev/null; then
