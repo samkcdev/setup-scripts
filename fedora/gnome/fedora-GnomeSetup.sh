@@ -180,11 +180,11 @@ local stremio='com.stremio.Stremio'
 local bottles='com.usebottles.bottles'
 local pikabk='org.gnome.World.PikaBackup'
 #local onlyoffice='org.onlyoffice.desktopeditors'
-local jellyfinMediaPlayer='com.github.iwalton3.jellyfin-media-player'
+local jellyfin='com.github.iwalton3.jellyfin-media-player'
 local extension='com.mattjakeman.ExtensionManager '
 local dconf='ca.desrt.dconf-editor'
 
-flatpak install flathub -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfinMediaPlayer $extension $dconf
+flatpak install flathub -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfin $extension $dconf
 
 echo "Flatpak apps Installation Done"
 echo "-----------------------------------------------"
