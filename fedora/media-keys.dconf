@@ -1,0 +1,52 @@
+[/]
+calculator=['<Super>c']
+control-center=['<Alt><Super>s']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/']
+home=['<Super>f']
+screenreader=@as []
+www=['<Super>b']
+
+[custom-keybindings/custom0]
+binding='<Super>Return'
+command='kitty'
+name='kitty'
+
+[custom-keybindings/custom1]
+binding='<Alt><Super>b'
+command='flatpak run app.zen_browser.zen -P private'
+name='zen-browser-personal'
+
+[custom-keybindings/custom2]
+binding='<Control><Super>s'
+command='systemctl suspend'
+name='suspend'
+
+[custom-keybindings/custom3]
+binding='<Alt><Super>m'
+command='distrobox-enter development -- /opt/brave.com/brave/brave-browser "--profile-directory=Profile 1" --app-id=cinhimbnkkaeohfgghhklpknlkffjgod'
+name='YT Music'
+
+[custom-keybindings/custom4]
+binding='<Alt><Super>t'
+command='distrobox-enter development -- /opt/brave.com/brave/brave-browser "--profile-directory=Profile 1" --app-id=knaiokfnmjjldlfhlioejgcompgenfhb'
+name='Todoist'
+
+[custom-keybindings/custom5]
+binding='<Super>w'
+command='nmcli r wifi on'
+name='wifi-on'
+
+[custom-keybindings/custom6]
+binding='<Control><Super>w'
+command='nmcli r wifi off'
+name='wifi-off'
+
+[custom-keybindings/custom7]
+binding='<Alt><Super>f'
+command='flatpak run app.zen_browser.zen -P Feeds_profile'
+name='Feeds'
+
+[custom-keybindings/custom8]
+binding='<Alt><Super>w'
+command='distrobox-enter development -- /usr/bin/brave-browser --profile-directory="Profile 1"'
+name='Brave-Apps'
