@@ -181,7 +181,7 @@ local bottles='com.usebottles.bottles'
 local pikabk='org.gnome.World.PikaBackup'
 #local onlyoffice='org.onlyoffice.desktopeditors'
 local jellyfin='com.github.iwalton3.jellyfin-media-player'
-local extension='com.mattjakeman.ExtensionManager '
+local extension='com.mattjakeman.ExtensionManager'
 local dconf='ca.desrt.dconf-editor'
 
 flatpak install flathub -y $obsidian $zen $flatseal $stremio $bottles $pikabk $jellyfin $extension $dconf
@@ -241,19 +241,19 @@ echo ""
 
 
 
+#install_free_nonfree_repositories
 update_system_packages
 install_packages
-install_free_nonfree_repositories
 install_openh264_library
 install_ffmpeg
 install_additional_codec
 install_hardware_accelerated_codec_intel_new
-install_nerd_fonts
 setup_local_dirs
 install_kitty
 install_chezmoi
 install_starship
 install_flatpak_apps
+install_nerd_fonts
 remove_packages
 
 echo "All installations completed successfully! Restart Your system now"
