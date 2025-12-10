@@ -74,7 +74,7 @@ system_updates() {
   success "System updates complete."
 }
 
-install_rpms() {
+install_packages() {
   log "Installing RPM Fusion and CLI packages..."
   # Install Repos first
   sudo dnf install -y "${RPM_FUSION_URLS[@]}"
@@ -87,7 +87,8 @@ setup_multimedia() {
   log "Configuring Multimedia (Codecs, FFmpeg, OpenH264)..."
 
   # OpenH264
-  sudo dnf config-manager --set-enabled fedora-cisco-openh264
+  #sudo dnf config-manager --set-enabled fedora-cisco-openh264 -- no longer valid
+  sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
 
   # FFmpeg (Swapping free for full version)
   sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
@@ -201,7 +202,7 @@ setup_local_dirs
 
 # System Stuff (Will ask for Sudo)
 system_updates
-install_rpms
+install_packages
 setup_multimedia
 cleanup_gnome
 
