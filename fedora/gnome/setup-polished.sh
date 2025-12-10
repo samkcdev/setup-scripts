@@ -12,18 +12,16 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-# DNF Packages
+# DNF Packages (Host System Utilities only)
+# Removed: dev tools. Kept: virtualization, system monitors, terminal tools.
 CLI_PKGS=(
-  gh lsd neovim btop fzf fastfetch mpv distrobox tealdeer
-  keepassxc bat qbittorrent gnome-tweaks @virtualization
+  gh distrobox @virtualization
+  neovim lsd btop fzf fastfetch
+  mpv keepassxc bat qbittorrent
+  gnome-tweaks unzip tealdeer
 )
 
-RPM_FUSION_URLS=(
-  "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
-  "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
-)
-
-# Flatpak Packages
+# Flatpak Packages (GUI Apps)
 FLATPAK_APPS=(
   md.obsidian.Obsidian
   app.zen_browser.zen
@@ -44,23 +42,31 @@ NERD_FONTS=("FiraCode" "FiraMono" "JetBrainsMono" "3270")
 # Utility Functions
 # -----------------------------------------------------------------------------
 
-log() {
-  echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-success() {
-  echo -e "${GREEN}[OK]${NC} $1"
-}
-
-warn() {
-  echo -e "${YELLOW}[WARN]${NC} $1"
+log() { echo -e "${BLUE}[INFO]${NC} $1"; }
+success() { echo -e "${GREEN}[OK]${NC} $1"; }
+warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+error() {
+  echo -e "${RED}[ERROR]${NC} $1"
+  exit 1
 }
 
 check_not_root() {
   if [[ $EUID -eq 0 ]]; then
-    echo -e "${RED}Error: This script must be run as a NORMAL USER, not root.${NC}"
-    echo "The script will use 'sudo' internally for system tasks."
-    exit 1
+    error "Run as NORMAL USER. The script uses 'sudo' internally."
+  fi
+}
+
+# Smart Directory Creation
+ensure_dir() {
+  local target="$1"
+  if [[ -d "$target" ]]; then
+    # Silent success or verbose log depending on preference.
+    # Comment out the next line if you want total silence for existing dirs.
+    log "Directory exists: $target"
+    return 0
+  else
+    mkdir -p "$target"
+    success "Created directory: $target"
   fi
 }
 
@@ -74,80 +80,107 @@ system_updates() {
   success "System updates complete."
 }
 
+setup_rpm_fusion() {
+  log "Configuring RPM Fusion..."
+  # Check if repo file exists to avoid costly network hit/error
+  if rpm -q rpmfusion-free-release &>/dev/null; then
+    warn "RPM Fusion is already installed. Skipping."
+  else
+    sudo dnf install -y "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+    sudo dnf install -y "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+    success "RPM Fusion installed."
+  fi
+}
+
 install_packages() {
-  log "Installing RPM Fusion and CLI packages..."
-  # Install Repos first
-  sudo dnf install -y "${RPM_FUSION_URLS[@]}"
-  # Install Packages
+  log "Installing Host Packages..."
   sudo dnf install -y "${CLI_PKGS[@]}"
-  success "RPM packages installed."
+  success "Host packages installed."
 }
 
 setup_multimedia() {
-  log "Configuring Multimedia (Codecs, FFmpeg, OpenH264)..."
+  log "Configuring Multimedia..."
 
-  # OpenH264
-  #sudo dnf config-manager --set-enabled fedora-cisco-openh264 -- no longer valid
+  # Cisco OpenH264
   sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
 
-  # FFmpeg (Swapping free for full version)
-  sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
+  # FFmpeg (Handle swap gracefully)
+  if rpm -q ffmpeg-free &>/dev/null; then
+    sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
+  else
+    sudo dnf install -y ffmpeg
+  fi
 
-  # Multimedia Group
+  # Multimedia Group (excluding buggy plugins)
   sudo dnf update -y @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin
 
-  # Intel Drivers (New)
-  sudo dnf install -y intel-media-driver
+  # Hardware Acceleration (Intel)
+  sudo dnf install -y intel-media-driver libva-intel-driver
 
   success "Multimedia setup complete."
 }
 
-setup_local_dirs() {
-  log "Creating local directory structure..."
-  mkdir -p "$HOME/.local/bin"
-  mkdir -p "$HOME/.local/share/applications"
-  mkdir -p "$HOME/.local/share/fonts"
-  success "Directories created."
-}
+setup_virtualization() {
+  log "Configuring Virtualization permissions..."
 
-install_kitty() {
-  log "Installing Kitty Terminal..."
-  if command -v kitty &>/dev/null; then
-    warn "Kitty is already installed."
+  # Ensure libvirt service is enabled
+  if ! systemctl is-active --quiet libvirtd; then
+    sudo systemctl enable --now libvirtd
+  fi
+
+  # Add user to libvirt group
+  if groups "$USER" | grep &>/dev/null 'libvirt'; then
+    log "User is already in libvirt group."
   else
-    # Install to local user
-    curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-
-    # Symlinks
-    ln -sf "$HOME/.local/kitty.app/bin/kitty" "$HOME/.local/bin/"
-    ln -sf "$HOME/.local/kitty.app/bin/kitten" "$HOME/.local/bin/"
-
-    # Desktop Integration
-    cp "$HOME/.local/kitty.app/share/applications/kitty.desktop" "$HOME/.local/share/applications/"
-    cp "$HOME/.local/kitty.app/share/applications/kitty-open.desktop" "$HOME/.local/share/applications/"
-
-    # Fix Icon Paths
-    sed -i "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" "$HOME/.local/share/applications/kitty*.desktop"
-    sed -i "s|Exec=kitty|Exec=$HOME/.local/kitty.app/bin/kitty|g" "$HOME/.local/share/applications/kitty*.desktop"
-
-    success "Kitty installed."
+    sudo usermod -aG libvirt "$USER"
+    success "User added to libvirt group."
   fi
 }
 
-install_chezmoi() {
-  log "Installing Chezmoi..."
+setup_local_env() {
+  log "Setting up local directories..."
+  ensure_dir "$HOME/.local/bin"
+  ensure_dir "$HOME/.local/share/applications"
+  ensure_dir "$HOME/.local/share/fonts"
+}
+
+install_kitty() {
+  log "Checking Kitty Terminal..."
+  if command -v kitty &>/dev/null; then
+    warn "Kitty is already installed. Skipping."
+    return
+  fi
+
+  log "Installing Kitty..."
+  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+
+  # Symlinks (Force overwrite with -sf to ensure they point to the right place)
+  ln -sf "$HOME/.local/kitty.app/bin/kitty" "$HOME/.local/bin/"
+  ln -sf "$HOME/.local/kitty.app/bin/kitten" "$HOME/.local/bin/"
+
+  # Desktop Integration
+  cp "$HOME/.local/kitty.app/share/applications/kitty.desktop" "$HOME/.local/share/applications/"
+  cp "$HOME/.local/kitty.app/share/applications/kitty-open.desktop" "$HOME/.local/share/applications/"
+
+  # Fix Icon/Exec Paths
+  sed -i "s|Icon=kitty|Icon=$HOME/.local/kitty.app/share/icons/hicolor/256x256/apps/kitty.png|g" "$HOME/.local/share/applications/kitty*.desktop"
+  sed -i "s|Exec=kitty|Exec=$HOME/.local/kitty.app/bin/kitty|g" "$HOME/.local/share/applications/kitty*.desktop"
+
+  success "Kitty installed."
+}
+
+install_chezmoi_starship() {
+  # Chezmoi
   if command -v chezmoi &>/dev/null; then
-    warn "Chezmoi is already installed."
+    warn "Chezmoi already installed."
   else
     sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
     success "Chezmoi installed."
   fi
-}
 
-install_starship() {
-  log "Installing Starship Prompt..."
+  # Starship
   if command -v starship &>/dev/null; then
-    warn "Starship is already installed."
+    warn "Starship already installed."
   else
     curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
     success "Starship installed."
@@ -155,41 +188,60 @@ install_starship() {
 }
 
 install_flatpaks() {
-  log "Setting up Flatpaks..."
+  log "Processing Flatpaks..."
 
-  # Ensure Flathub is added (Fedora sometimes filters it)
-  flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+  # Add Remote
+  if ! flatpak remote-list | grep -q "flathub"; then
+    flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
+  fi
 
-  # Install apps (User scope preferred for personal dev machines)
+  # Install
+  # We use 'flatpak install' which handles "already installed" gracefully,
+  # but checking first is faster for the whole list.
   flatpak install --user -y flathub "${FLATPAK_APPS[@]}"
 
-  success "Flatpaks installed."
+  success "Flatpaks processed."
 }
 
 install_fonts() {
-  log "Installing Nerd Fonts..."
+  log "Checking Fonts..."
   local font_dir="$HOME/.local/share/fonts"
+  local new_fonts_installed=false
 
   for font in "${NERD_FONTS[@]}"; do
     if ls "$font_dir/$font"/*.ttf &>/dev/null; then
-      warn "Font $font already exists. Skipping."
+      # Skipping log to reduce noise, uncomment if needed
+      # log "Font $font exists."
+      continue
     else
       log "Downloading $font..."
       wget -q --show-progress "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.3.0/$font.zip" -P /tmp
+      ensure_dir "$font_dir/$font"
       unzip -q -o "/tmp/$font.zip" -d "$font_dir/$font/"
       rm "/tmp/$font.zip"
+      new_fonts_installed=true
     fi
   done
 
-  fc-cache -f
-  success "Fonts installed."
+  if [ "$new_fonts_installed" = true ]; then
+    fc-cache -f
+    success "New fonts installed and cached."
+  else
+    success "All fonts were already present."
+  fi
 }
 
 cleanup_gnome() {
-  log "Cleaning up bloatware..."
-  sudo dnf remove -y gnome-connections gnome-tour gnome-boxes gnome-maps libreoffice*
-  sudo dnf autoremove -y
-  success "Cleanup complete."
+  log "Running cleanup..."
+  # Only remove if they are actually present to avoid 'package not found' warnings
+  local bloat=(gnome-connections gnome-tour gnome-boxes gnome-maps libreoffice*)
+
+  for pkg in "${bloat[@]}"; do
+    if rpm -q "$pkg" &>/dev/null; then
+      sudo dnf remove -y "$pkg"
+      success "Removed $pkg"
+    fi
+  done
 }
 
 # -----------------------------------------------------------------------------
@@ -198,22 +250,25 @@ cleanup_gnome() {
 
 check_not_root
 sudo -v
-setup_local_dirs
+setup_local_env
 
-# System Stuff (Will ask for Sudo)
+# Host System Configuration
 system_updates
+setup_rpm_fusion
 install_packages
 setup_multimedia
-cleanup_gnome
+setup_virtualization
 
-# User Stuff (No Sudo)
+# User Apps & Configs
 install_kitty
-install_chezmoi
-install_starship
+install_chezmoi_starship
 install_flatpaks
 install_fonts
+cleanup_gnome
 
 echo ""
 echo -e "${GREEN}------------------------------------------------${NC}"
-echo -e "${GREEN}   Installation Complete! Please Restart.       ${NC}"
+echo -e "${GREEN}   Host Setup Complete!                         ${NC}"
+echo -e "${GREEN}   Now use Distrobox for your dev work:         ${NC}"
+echo -e "${BLUE}   distrobox create -n angular-dev -i fedora:40 ${NC}"
 echo -e "${GREEN}------------------------------------------------${NC}"
