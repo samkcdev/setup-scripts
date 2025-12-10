@@ -102,7 +102,7 @@ setup_multimedia() {
   log "Configuring Multimedia..."
 
   # Cisco OpenH264
-  sudo dnf config-manager --enable fedora-cisco-openh264
+  sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
 
   # FFmpeg (Handle swap gracefully)
   if rpm -q ffmpeg-free &>/dev/null; then
