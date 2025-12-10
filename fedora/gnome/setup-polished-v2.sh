@@ -62,7 +62,7 @@ ensure_dir() {
   if [[ -d "$target" ]]; then
     # Silent success or verbose log depending on preference.
     # Comment out the next line if you want total silence for existing dirs.
-    # log "Directory exists: $target"
+    log "Directory exists: $target"
     return 0
   else
     mkdir -p "$target"
@@ -76,7 +76,7 @@ ensure_dir() {
 
 system_updates() {
   log "Starting System Updates..."
-  sudo dnf upgrade -y --refresh
+  sudo dnf upgrade -y
   success "System updates complete."
 }
 
@@ -234,7 +234,7 @@ install_fonts() {
 cleanup_gnome() {
   log "Running cleanup..."
   # Only remove if they are actually present to avoid 'package not found' warnings
-  local bloat=(gnome-connections gnome-tour gnome-boxes gnome-maps libreoffice-core)
+  local bloat=(gnome-connections gnome-tour gnome-boxes gnome-maps libreoffice*)
 
   for pkg in "${bloat[@]}"; do
     if rpm -q "$pkg" &>/dev/null; then
