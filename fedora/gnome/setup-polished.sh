@@ -198,7 +198,7 @@ install_flatpaks() {
   # Install
   # We use 'flatpak install' which handles "already installed" gracefully,
   # but checking first is faster for the whole list.
-  flatpak install --user -y flathub "${FLATPAK_APPS[@]}"
+  flatpak install flathub -y "${FLATPAK_APPS[@]}"
 
   success "Flatpaks processed."
 }
