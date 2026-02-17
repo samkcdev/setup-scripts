@@ -9,6 +9,7 @@ TARGETS=(
     "Pictures"
     "study-projects"
     "setup-scripts"
+    "Zotero"
     ".zen"
     ".config/kitty"
     ".config/mpv"
