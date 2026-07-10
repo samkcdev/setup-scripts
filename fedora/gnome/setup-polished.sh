@@ -18,7 +18,7 @@ CLI_PKGS=(
   gh distrobox @virtualization
   neovim lsd btop fzf fastfetch
   mpv keepassxc bat qbittorrent
-  gnome-tweaks unzip tealdeer
+  gnome-tweaks unzip tealdeer chezmoi
 )
 
 # Flatpak Packages (GUI Apps)
@@ -171,12 +171,12 @@ install_kitty() {
 
 install_chezmoi_starship() {
   # Chezmoi
-  if command -v chezmoi &>/dev/null; then
-    warn "Chezmoi already installed."
-  else
-    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
-    success "Chezmoi installed."
-  fi
+  #if command -v chezmoi &>/dev/null; then
+  #  warn "Chezmoi already installed."
+  #else
+  #  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+  #  success "Chezmoi installed."
+  #fi
 
   # Starship
   if command -v starship &>/dev/null; then

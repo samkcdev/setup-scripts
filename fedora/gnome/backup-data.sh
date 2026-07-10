@@ -77,6 +77,18 @@ for ITEM in "${TARGETS[@]}"; do
     if ! rsync -avR --delete \
         --exclude='node_modules/' \
         --exclude='dist/' \
+        --exclude='.cache/' \
+        --exclude='.local/share/Trash/' \
+        --exclude='.local/share/pnpm/store/' \
+        --exclude='.local/share/fnm/' \
+        --exclude='go/pkg/mod/' \
+        --exclude='.npm/' \
+        --exclude='.config/Code/Cache/' \
+        --exclude='.config/Code/CachedData/' \
+        --exclude='.config/Code/CachedExtensionVSIXs/' \
+        --exclude='.config/Code/logs/' \
+        --exclude='.config/Code/Crashpad/' \
+        --exclude='.config/Code/User/workspaceStorage/' \
         --link-dest="$LATEST_LINK" \
         "$HOME/./$ITEM" "$CURRENT_BACKUP/"; then
         echo " ⚠️  WARNING: Failed to sync '$ITEM'"
