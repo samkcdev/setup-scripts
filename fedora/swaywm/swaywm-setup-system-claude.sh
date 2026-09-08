@@ -79,7 +79,7 @@ FLATPAK_APPS=(
   com.github.tchx84.Flatseal             # Flatpak permissions manager
   com.stremio.Stremio                     # Media streaming hub
   com.usebottles.bottles                  # Wine manager for Windows apps
- # org.gnome.World.PikaBackup             # GNOME backup tool (Borg-based)
+  org.gnome.World.PikaBackup             # GNOME backup tool (Borg-based)
   org.onlyoffice.desktopeditors          # MS Office-compatible office suite
 )
 
