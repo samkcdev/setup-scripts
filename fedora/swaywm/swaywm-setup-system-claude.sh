@@ -224,13 +224,7 @@ setup_multimedia() {
   # FFmpeg: Fedora ships 'ffmpeg-free' (missing patented codecs).
   # We swap it for the full RPM Fusion build which includes everything.
   log "Configuring FFmpeg..."
-  if rpm -q ffmpeg-free &>/dev/null; then
-    log "Swapping ffmpeg-free → ffmpeg (full build)..."
     sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing
-  else
-    log "Installing ffmpeg..."
-    sudo dnf install -y ffmpeg
-  fi
 
   # Multimedia group: GStreamer plugins and codec support
   # '--exclude=PackageKit-gstreamer-plugin' skips a plugin that can conflict
