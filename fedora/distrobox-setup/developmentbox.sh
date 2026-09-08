@@ -1,4 +1,6 @@
+#!/usr/bin/env bash
 
+sudo dnf upgrade -y
 #installing vscode
 # check vscode is installed yes then ignore
 # else install
