@@ -17,8 +17,10 @@ TARGETS=(
     ".config/mpv"
     ".config/yazi"
     ".config/zellij"
+    ".config/niri"
+    ".config/noctalia"
+    ".local/state/noctalia"
     ".var/app/com.usebottles.bottles/data/bottles/bottles/adult/drive_c/users/steamuser/AppData/Roaming/RenPy"
-    ".renpy"
     "distrobox/development"
     "distrobox/softwares"
 )
