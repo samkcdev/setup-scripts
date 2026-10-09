@@ -5,14 +5,15 @@ set -uo pipefail
 # --- CONFIGURATION ---
 # List exactly what you want to backup (relative to your Home folder)
 # No trailing slashes here; we handle that in the loop.
-    #"books"
+    # "books"
+    # "study-projects"
+    # ".zen"
+    # "Zotero"
 TARGETS=(
     "Documents"
     "Pictures"
-    "study-projects"
     "setup-scripts"
-    "Zotero"
-    ".zen"
+    ".var/app/app.zen_browser.zen/config/zen"
     ".config/kitty"
     ".config/mpv"
     ".config/yazi"
